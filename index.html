@@ -1,1040 +1,575 @@
+<!-- Save as index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Quant Project</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-            background: #000;
-            color: #fff;
-            overflow-x: hidden;
-        }
-
-        /* Navigation */
-        nav {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            padding: 1.5rem 4rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 3rem;
-            list-style: none;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .nav-links a {
-            color: rgba(255, 255, 255, 0.7);
-            text-decoration: none;
-            font-size: 0.95rem;
-            transition: color 0.3s ease;
-            position: relative;
-        }
-
-        .nav-links a:hover,
-        .nav-links a.active {
-            color: #fff;
-        }
-
-        .nav-links a.active::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: #fff;
-        }
-
-        /* Hero Section */
-        .hero {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .gradient-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-            opacity: 0.4;
-        }
-
-        .gradient-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            animation: float 20s ease-in-out infinite;
-        }
-
-        .orb1 {
-            width: 600px;
-            height: 600px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            top: -200px;
-            left: -200px;
-            animation-delay: 0s;
-        }
-
-        .orb2 {
-            width: 500px;
-            height: 500px;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            bottom: -150px;
-            right: -150px;
-            animation-delay: 5s;
-        }
-
-        .orb3 {
-            width: 400px;
-            height: 400px;
-            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            animation-delay: 10s;
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translate(0, 0) scale(1);
-            }
-            33% {
-                transform: translate(100px, -100px) scale(1.1);
-            }
-            66% {
-                transform: translate(-100px, 100px) scale(0.9);
-            }
-        }
-
-        .chart-lines {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            z-index: 2;
-            opacity: 0.15;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 10;
-            text-align: center;
-        }
-
-        h1 {
-            font-size: 7rem;
-            font-weight: 700;
-            letter-spacing: -3px;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.6) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .tagline {
-            font-size: 1.3rem;
-            color: rgba(255, 255, 255, 0.6);
-            font-weight: 400;
-            letter-spacing: 0.5px;
-        }
-
-        .cta-button {
-            margin-top: 3rem;
-            padding: 1rem 2.5rem;
-            background: #fff;
-            color: #000;
-            border: none;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .cta-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
-        }
-
-        /* MAIN CONTENT WRAPPER (About + Services + star canvas) */
-        .main-content {
-            position: relative;
-            z-index: 1;
-            overflow: hidden;
-            margin-top: -40px; /* overlap hero for smoother transition */
-        }
-
-        /* soft gradient that blends hero -> content */
-        .main-content::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 90px;
-            background: linear-gradient(
-                to bottom,
-                rgba(0, 0, 0, 0) 0%,
-                rgba(5, 5, 15, 0.85) 45%,
-                rgba(5, 5, 15, 1) 100%
-            );
-            pointer-events: none;
-            z-index: 0; /* over stars, under cards */
-        }
-
-        .stars-canvas {
-            position: absolute;
-            inset: 0;
-            z-index: 0;
-            opacity: 0.55;
-            pointer-events: none;
-        }
-
-        /* Floating sections (About + Services) */
-        .section-shell {
-            position: relative;
-            z-index: 1; /* above star canvas & gradient */
-            padding: 5rem 4rem;
-            max-width: 1200px;
-            margin: 0 auto 4rem auto;
-            border-radius: 24px;
-            box-shadow:
-                0 26px 60px rgba(0, 0, 0, 0.95),
-                0 0 60px rgba(102, 126, 234, 0.32);
-            background: radial-gradient(circle at top, rgba(15,15,30,0.96), rgba(5,5,15,0.98));
-            transform: translateY(0);
-            animation: floatSection 14s ease-in-out infinite alternate;
-        }
-
-        @keyframes floatSection {
-            0% {
-                transform: translateY(0) translateZ(0) scale(1);
-            }
-            100% {
-                transform: translateY(-14px) translateZ(0) scale(1.01);
-            }
-        }
-
-        .section-shell::before {
-            content: '';
-            position: absolute;
-            inset: -40px;
-            background: radial-gradient(circle at top, rgba(102,126,234,0.45), transparent 70%);
-            opacity: 0.95;
-            pointer-events: none;
-            z-index: -2;
-            filter: blur(10px);
-        }
-
-        .section-shell::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 24px;
-            border: 1px solid rgba(255,255,255,0.1);
-            background: radial-gradient(circle at top left, rgba(118,75,162,0.3), transparent 70%);
-            opacity: 0.95;
-            z-index: -1;
-            animation: glow-pan 12s ease-in-out infinite alternate;
-        }
-
-        @keyframes glow-pan {
-            0% { transform: translate3d(-10px, -10px, 0); }
-            100% { transform: translate3d(10px, 10px, 0); }
-        }
-
-        .section-inner {
-            animation: fadeUp 0.9s ease both;
-        }
-
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* About Section */
-        .about-header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .about-header h2 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .about-header p {
-            font-size: 1.1rem;
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        .about-section h3 {
-            font-size: 2rem;
-            margin-bottom: 1.5rem;
-            margin-top: 2rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .about-section h3:first-child {
-            margin-top: 0;
-        }
-
-        .about-section p {
-            font-size: 1.05rem;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.88);
-            margin-bottom: 1.5rem;
-        }
-
-        .about-values {
-            margin-left: 2rem;
-            margin-bottom: 1.5rem;
-            color: rgba(255, 255, 255, 0.85);
-        }
-
-        .about-values li {
-            margin-bottom: 0.5rem;
-        }
-
-        .team-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin: 2rem 0;
-        }
-
-        .team-member {
-            padding: 2rem;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            border-radius: 14px;
-            text-align: center;
-            transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
-        }
-
-        .team-member:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.9);
-            background: rgba(102, 126, 234, 0.12);
-        }
-
-        .team-member h4 {
-            margin-bottom: 0.5rem;
-            color: #667eea;
-        }
-
-        .team-member p {
-            font-size: 0.95rem;
-            color: rgba(255, 255, 255, 0.75);
-            margin-bottom: 0;
-        }
-
-        /* Services Section */
-        .services-header {
-            text-align: center;
-            margin-bottom: 2.5rem;
-        }
-
-        .services-header h2 {
-            font-size: 2.4rem;
-            margin-bottom: 0.75rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .services-header p {
-            font-size: 1.05rem;
-            color: rgba(255, 255, 255, 0.78);
-        }
-
-        .services-intro {
-            font-size: 1.05rem;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.88);
-            margin-bottom: 2rem;
-            text-align: center;
-            max-width: 820px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .services-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 2rem;
-            margin: 2rem 0;
-        }
-
-        .service-card {
-            padding: 2rem;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            border-radius: 14px;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .service-card::before {
-            content: '';
-            position: absolute;
-            inset: -40%;
-            background: radial-gradient(circle at top, rgba(240,147,251,0.28), transparent 55%);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .service-card:hover::before {
-            opacity: 1;
-        }
-
-        .service-card:hover {
-            background: rgba(102, 126, 234, 0.14);
-            border-color: rgba(102, 126, 234, 0.9);
-            transform: translateY(-6px);
-            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.95);
-        }
-
-        .service-card h3 {
-            font-size: 1.3rem;
-            margin-bottom: 1rem;
-            color: #667eea;
-        }
-
-        .service-card p {
-            font-size: 0.98rem;
-            line-height: 1.7;
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 0;
-        }
-
-        .services-footer-title {
-            font-size: 1.3rem;
-            margin-top: 3rem;
-            margin-bottom: 0.75rem;
-            background: linear-gradient(135deg, #f093fb 0%, #667eea 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-align: center;
-        }
-
-        .services-footer-text {
-            font-size: 1.02rem;
-            line-height: 1.8;
-            color: rgba(255, 255, 255, 0.85);
-            text-align: center;
-            max-width: 820px;
-            margin: 0 auto;
-        }
-
-        /* Mobile Menu Toggle */
-        .menu-toggle {
-            display: none;
-            flex-direction: column;
-            gap: 6px;
-            cursor: pointer;
-            position: absolute;
-            right: 2rem;
-        }
-
-        .menu-toggle span {
-            width: 25px;
-            height: 2px;
-            background: #fff;
-            transition: all 0.3s ease;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            nav {
-                padding: 1rem 2rem;
-            }
-
-            .nav-links {
-                position: fixed;
-                top: 70px;
-                right: -100%;
-                flex-direction: column;
-                background: rgba(0, 0, 0, 0.95);
-                padding: 2rem;
-                gap: 1.5rem;
-                width: 250px;
-                transition: right 0.3s ease;
-                border-left: 1px solid rgba(255, 255, 255, 0.1);
-                justify-content: flex-start;
-            }
-
-            .nav-links.active {
-                right: 0;
-            }
-
-            .menu-toggle {
-                display: flex;
-            }
-
-            h1 {
-                font-size: 3.5rem;
-            }
-
-            .tagline {
-                font-size: 1rem;
-            }
-
-            .section-shell {
-                padding: 4rem 2rem;
-            }
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Quant Project — Single Page</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    :root { --glass: rgba(5,5,15,0.98); --accent1: #667eea; --accent2: #764ba2; --accent3: #f093fb; }
+
+    html { scroll-behavior: smooth; }
+    body { background: #000; color: #fff; font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; overflow-x: hidden; }
+
+    /* Progress bar */
+    #progressBar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 6px;
+      width: 100%;
+      z-index: 1100;
+      background: linear-gradient(90deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+    }
+    #progressBar > #progress {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent1), var(--accent2), var(--accent3));
+      box-shadow: 0 4px 20px rgba(102,126,234,0.18);
+      transition: width 120ms linear;
+    }
+
+    /* Hero */
+    .hero { height: 100vh; position: relative; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .gradient-bg { position: absolute; inset: 0; z-index: 1; opacity: 0.4; pointer-events: none; }
+    .gradient-orb { position: absolute; border-radius: 50%; filter: blur(60px); animation: float 20s ease-in-out infinite; }
+    .orb1 { width: 600px; height: 600px; background: linear-gradient(135deg, var(--accent1) 0%, var(--accent2) 100%); top: -200px; left: -200px; }
+    .orb2 { width: 500px; height: 500px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); bottom: -150px; right: -150px; animation-delay: 5s; }
+    .orb3 { width: 400px; height: 400px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: 10s; }
+
+    @keyframes float {
+      0%,100%{ transform: translate(0,0) scale(1); }
+      33%{ transform: translate(100px,-100px) scale(1.05); }
+      66%{ transform: translate(-100px,100px) scale(0.95); }
+    }
+
+    #chartCanvas { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: 0.9; }
+
+    .hero-content { position: relative; z-index: 10; text-align: center; padding: 0 1rem; }
+
+    .main-content { position: relative; z-index: 1; margin-top: -40px; padding-bottom: 6rem; }
+    .main-content::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 90px;
+      background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(5,5,15,0.85) 45%, rgba(5,5,15,1) 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .section-shell {
+      margin: 3.2rem auto;
+      max-width: 1200px;
+      border-radius: 20px;
+      padding: 3.5rem;
+      background: radial-gradient(circle at top, rgba(15,15,30,0.96), rgba(5,5,15,0.98));
+      box-shadow: 0 26px 60px rgba(0,0,0,0.95), 0 0 60px rgba(102,126,234,0.32);
+      position: relative;
+      overflow: visible;
+    }
+    .section-shell::before {
+      content: ''; position: absolute; inset: -36px; background: radial-gradient(circle at top, rgba(102,126,234,0.45), transparent 70%); opacity: .95; filter: blur(10px); z-index: -2;
+      border-radius: 24px;
+    }
+    .section-shell::after {
+      content: ''; position: absolute; inset: 0; border-radius: 24px; border: 1px solid rgba(255,255,255,0.06); background: radial-gradient(circle at top left, rgba(118,75,162,0.18), transparent 70%); z-index: -1; animation: glow-pan 12s ease-in-out infinite alternate;
+    }
+    @keyframes glow-pan { 0%{ transform: translate3d(-8px,-8px,0);} 100%{ transform: translate3d(8px,8px,0);} }
+
+    #starsCanvas { position: absolute; inset: 0; z-index: 0; opacity: 0.55; pointer-events: none; }
+
+    h1.hero-title { font-size: clamp(36px, 9vw, 84px); font-weight: 800; line-height: 0.95; letter-spacing: -2px; background: linear-gradient(135deg,#fff 0%, rgba(255,255,255,0.85) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .tagline { color: rgba(255,255,255,0.72); font-size: 1.05rem; }
+
+    .service-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(102,126,234,0.28); border-radius: 12px; padding: 1.6rem; transition: all .25s ease; }
+    .service-card:hover { transform: translateY(-6px); background: rgba(102,126,234,0.12); border-color: rgba(102,126,234,0.9); box-shadow: 0 18px 45px rgba(0,0,0,0.95); }
+
+    .team-member { padding: 1.6rem; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(102,126,234,0.2); text-align: center; transition: .25s; }
+    .team-member:hover { transform: translateY(-6px); box-shadow: 0 18px 45px rgba(0,0,0,0.9); background: rgba(102,126,234,0.08); }
+
+    .glass-input { background: rgba(255,255,255,0.06); border: 1px solid rgba(102,126,234,0.24); color: #fff; padding: .75rem .9rem; border-radius: 8px; width: 100%; }
+
+    @media (max-width: 768px) {
+      .section-shell { padding: 2rem; margin: 2rem 1rem; }
+    }
+  </style>
 </head>
+
 <body>
-    <nav>
-        <ul class="nav-links" id="navLinks">
-            <li><a href="index.html" class="active">Home</a></li>
-            <li><a href="blogs.html">Blogs</a></li>
-            <li><a href="contact.html">Contact Us</a></li>
-        </ul>
-        <div class="menu-toggle" id="menuToggle">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-    </nav>
+  <!-- PROGRESS BAR -->
+  <div id="progressBar" aria-hidden="true"><div id="progress"></div></div>
 
-    <section class="hero">
-        <div class="gradient-bg">
-            <div class="gradient-orb orb1"></div>
-            <div class="gradient-orb orb2"></div>
-            <div class="gradient-orb orb3"></div>
-        </div>
-        
-        <canvas class="chart-lines" id="chartCanvas"></canvas>
-        
-        <div class="hero-content">
-            <h1>THE QUANT PROJECT</h1>
-            <p class="tagline">Quantitative Trading. Algorithmic Precision.</p>
-            <button class="cta-button" onclick="document.getElementById('servicesSection').scrollIntoView({ behavior: 'smooth' });">
-                Get Started
-            </button>
-        </div>
-    </section>
-
-    <div class="main-content">
-        <canvas id="starsCanvas" class="stars-canvas"></canvas>
-
-        <section class="section-shell about-section" id="aboutSection">
-            <div class="section-inner">
-                <div class="about-header">
-                    <h2>About The Quant Project</h2>
-                    <p>Our story, mission, and the team behind the innovation</p>
-                </div>
-
-                <h3>Our Story</h3>
-                <p>
-                    Founded with a vision to revolutionize quantitative trading, The Quant Project brings together
-                    world-class traders, data scientists, and financial engineers. We've been at the forefront of
-                    algorithmic trading innovation, developing strategies that consistently outperform traditional
-                    investment approaches.
-                </p>
-
-                <h3>Our Mission</h3>
-                <p>
-                    We believe in democratizing advanced quantitative trading. Our mission is to make sophisticated
-                    trading strategies accessible to traders and investors of all levels, while maintaining the highest
-                    standards of risk management and ethical trading practices.
-                </p>
-
-                <h3>Our Values</h3>
-                <ul class="about-values">
-                    <li>Innovation through data-driven insights</li>
-                    <li>Transparency in all trading operations</li>
-                    <li>Commitment to risk management excellence</li>
-                    <li>Continuous learning and improvement</li>
-                    <li>Community-first approach</li>
-                </ul>
-
-                <h3>Our Team</h3>
-                <p>
-                    Our team consists of experienced professionals with backgrounds in mathematics, computer science,
-                    finance, and economics.
-                </p>
-
-                <div class="team-grid">
-                    <div class="team-member">
-                        <h4>Trading Experts</h4>
-                        <p>Decades of combined experience in financial markets and trading strategies</p>
-                    </div>
-                    <div class="team-member">
-                        <h4>Data Scientists</h4>
-                        <p>PhD-level experts in machine learning, statistics, and quantitative analysis</p>
-                    </div>
-                    <div class="team-member">
-                        <h4>Software Engineers</h4>
-                        <p>Top-tier developers building scalable, high-performance trading systems</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="section-shell" id="servicesSection">
-            <div class="section-inner">
-                <div class="services-header">
-                    <h2>Our Services</h2>
-                    <p>Comprehensive quantitative trading solutions</p>
-                </div>
-
-                <p class="services-intro">
-                    We offer a complete suite of quantitative trading services designed for individual traders and
-                    institutional investors. From idea generation to execution and monitoring, we help you build
-                    disciplined, data-driven trading processes.
-                </p>
-
-                <div class="services-grid">
-                    <div class="service-card">
-                        <h3>Algorithmic Trading</h3>
-                        <p>Automated trading strategies powered by machine learning and statistical analysis, designed to capture market inefficiencies consistently.</p>
-                    </div>
-                    <div class="service-card">
-                        <h3>Strategy Development</h3>
-                        <p>Custom quantitative strategies tailored to your trading style, risk tolerance, and market preferences. Backtested and optimized for performance.</p>
-                    </div>
-                    <div class="service-card">
-                        <h3>Risk Management</h3>
-                        <p>Advanced portfolio optimization and risk management techniques to protect your capital while maximizing returns.</p>
-                    </div>
-                    <div class="service-card">
-                        <h3>Data Analysis</h3>
-                        <p>In-depth market analysis using advanced statistical methods and big data technologies to identify trading opportunities.</p>
-                    </div>
-                    <div class="service-card">
-                        <h3>Performance Tracking</h3>
-                        <p>Real-time monitoring and reporting of trading performance with detailed metrics and analytics.</p>
-                    </div>
-                    <div class="service-card">
-                        <h3>Training &amp; Support</h3>
-                        <p>Comprehensive training programs and dedicated support to help you maximize the effectiveness of your trading systems.</p>
-                    </div>
-                </div>
-
-                <h4 class="services-footer-title">Why Choose The Quant Project?</h4>
-                <p class="services-footer-text">
-                    Our track record speaks for itself. With years of experience in quantitative finance and a team of
-                    world-class experts, we deliver results that matter. We combine rigorous data science with practical
-                    trading expertise to create solutions that work in real market conditions.
-                </p>
-            </div>
-        </section>
+  <!-- HERO -->
+  <header class="hero">
+    <div class="gradient-bg" aria-hidden="true">
+      <div class="gradient-orb orb1"></div>
+      <div class="gradient-orb orb2"></div>
+      <div class="gradient-orb orb3"></div>
     </div>
 
-    <script>
-        const menuToggle = document.getElementById('menuToggle');
-        const navLinks = document.getElementById('navLinks');
+    <canvas id="chartCanvas"></canvas>
 
-        menuToggle.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
+    <div class="hero-content px-4">
+      <!-- LOGO ABOVE TITLE -->
+      <img src="logo.png" alt="The Quant Project logo"
+           class="mx-auto mb-4 w-20 h-20 rounded-full object-contain shadow-lg" />
+
+      <h1 class="hero-title">THE QUANT PROJECT</h1>
+      <p class="tagline mt-3">Quantitative Trading. Algorithmic Precision.</p>
+
+      <div class="mt-8 flex items-center justify-center gap-4">
+        <button id="ctaStart" class="bg-white text-black font-semibold px-6 py-3 rounded-full shadow hover:translate-y-[-2px]">
+          
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-content relative">
+    <canvas id="starsCanvas"></canvas>
+
+    <!-- ABOUT -->
+    <section id="aboutSection" class="section-shell">
+      <div class="max-w-4xl mx-auto">
+        <div class="text-center mb-8">
+          <h2 class="text-4xl font-extrabold" style="background: linear-gradient(135deg,var(--accent1),var(--accent2),var(--accent3)); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">About The Quant Project</h2>
+          <p class="mt-2 text-white/70">Our story, mission, and the team behind the innovation</p>
+        </div>
+
+        <h3 class="text-2xl font-semibold" style="background: linear-gradient(135deg,var(--accent1),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Our Story</h3>
+        <p class="mt-3 text-white/85 leading-relaxed">Founded with a vision to revolutionize quantitative trading,We've been at the forefront of algorithmic trading innovation, developing strategies that consistently outperform traditional investment approaches.</p>
+
+        <h3 class="text-2xl font-semibold mt-6" style="background: linear-gradient(135deg,var(--accent1),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Our Mission</h3>
+        <p class="mt-3 text-white/85 leading-relaxed">We believe in devloping quantitative trading strategies and let your money grow by itself while staying emotionally sane.</p>
+
+        <h3 class="text-2xl font-semibold mt-6" style="background: linear-gradient(135deg,var(--accent1),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Our Values</h3>
+        <ul class="mt-3 ml-6 list-disc text-white/90 space-y-1">
+          <li>Innovation through data-driven insights</li>
+          <li>Transparency in all trading operations</li>
+          <li>Commitment to risk management excellence</li>
+          <li>Continuous learning and improvement</li>
+        </ul>
+
+        <h3 class="text-2xl font-semibold mt-6" style="background: linear-gradient(135deg,var(--accent1),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Our Team</h3>
+        <p class="mt-3 text-white/85">Our team consists of market enthusiasts, we got into markets accidentally and ended up here.</p>
+
+      </div>
+    </section>
+
+    <!-- SERVICES -->
+    <section id="servicesSection" class="section-shell">
+      <div class="max-w-5xl mx-auto">
+        <div class="text-center mb-6">
+          <h2 class="text-3xl font-extrabold" style="background: linear-gradient(135deg,var(--accent1),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Our Services</h2>
+          <p class="mt-2 text-white/70">Comprehensive quantitative trading solutions</p>
+        </div>
+
+        <p class="services-intro text-center text-white/85 max-w-3xl mx-auto">We offer a complete suite of quantitative trading services designed for individual traders and institutional investors. From idea generation to execution and monitoring, we help you build disciplined, data-driven trading processes.</p>
+
+        <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="service-card">
+            <h3 class="text-lg font-semibold text-[--accent1]">Algorithmic Trading</h3>
+            <p class="text-white/80 mt-2">Automated trading strategies powered by machine learning and statistical analysis, designed to capture market inefficiencies consistently.</p>
+          </div>
+
+          <div class="service-card">
+            <h3 class="text-lg font-semibold text-[--accent1]">Strategy Development</h3>
+            <p class="text-white/80 mt-2">Custom quantitative strategies tailored to your trading style, risk tolerance, and market preferences. Backtested and optimized for performance.</p>
+          </div>
+
+          <div class="service-card">
+            <h3 class="text-lg font-semibold text-[--accent1]">Risk Management</h3>
+            <p class="text-white/80 mt-2">Advanced portfolio optimization and risk management techniques to protect your capital while maximizing returns.</p>
+          </div>
+
+          <div class="service-card">
+            <h3 class="text-lg font-semibold text-[--accent1]">Data Analysis</h3>
+            <p class="text-white/80 mt-2">In-depth market analysis using advanced statistical methods and big data technologies to identify trading opportunities.</p>
+          </div>
+
+          <div class="service-card">
+            <h3 class="text-lg font-semibold text-[--accent1]">Performance Tracking</h3>
+            <p class="text-white/80 mt-2">Real-time monitoring and reporting of trading performance with detailed metrics and analytics.</p>
+          </div>
+
+          <div class="service-card">
+            <h3 class="text-lg font-semibold text-[--accent1]">Training & Support</h3>
+            <p class="text-white/80 mt-2">Comprehensive training programs and dedicated support to help you maximize the effectiveness of your trading systems.</p>
+          </div>
+        </div>
+
+        <div class="mt-8 text-center">
+          <h4 class="text-xl font-semibold" style="background: linear-gradient(135deg,#f093fb 0%, var(--accent1) 100%); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Why Choose The Quant Project?</h4>
+          <p class="mt-3 text-white/85 max-w-3xl mx-auto">Our track record speaks for itself. With years of experience in quantitative finance and a team of world-class experts, we deliver results that matter. We combine rigorous data science with practical trading expertise to create solutions that work in real market conditions.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contactSection" class="section-shell">
+      <div class="max-w-4xl mx-auto">
+        <div class="text-center mb-6">
+          <h2 class="text-3xl font-extrabold" style="background: linear-gradient(135deg,var(--accent1),var(--accent2)); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">Get In Touch</h2>
+          <p class="mt-2 text-white/70">We'd love to hear from you. Let's discuss your trading goals.</p>
+        </div>
+
+        <p class="text-white/80">Have questions about our services? Need a custom trading strategy? Fill out the form below and our team will get back to you as soon as possible.</p>
+
+        <div class="mt-6 max-w-xl mx-auto">
+          <form id="contactForm" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium mb-1">Name</label>
+              <input class="glass-input" type="text" id="name" name="name" required />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">Email</label>
+              <input class="glass-input" type="email" id="email" name="email" required />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">Subject</label>
+              <input class="glass-input" type="text" id="subject" name="subject" required />
+            </div>
+            <div>
+              <label class="block text-sm font-medium mb-1">Message</label>
+              <textarea class="glass-input min-h-[120px]" id="message" name="message" required></textarea>
+            </div>
+
+            <div>
+              <button type="submit" class="w-full py-2 rounded-md bg-gradient-to-r from-[--accent1] to-[--accent2] font-semibold">Send Message</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <footer class="mt-8 text-center text-white/60 text-sm">© <span id="year"></span> The Quant Project</footer>
+  </main>
+
+  <script>
+    /* Progress bar */
+    const progressEl = document.getElementById('progress');
+    function updateProgress() {
+      const scrollTop = window.scrollY || window.pageYOffset;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = docHeight <= 0 ? 0 : Math.min(100, (scrollTop / docHeight) * 100);
+      progressEl.style.width = pct + '%';
+    }
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    window.addEventListener('resize', updateProgress);
+    updateProgress();
+
+
+    document.getElementById('year').innerText = new Date().getFullYear();
+
+    /* HERO CHART LINES (optimized) */
+    const canvas = document.getElementById('chartCanvas');
+    const ctx = canvas.getContext('2d');
+    let chartW = window.innerWidth;
+    let chartH = window.innerHeight;
+
+    function resizeChartCanvas() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      chartW = window.innerWidth;
+      chartH = window.innerHeight;
+
+      canvas.width = chartW * dpr;
+      canvas.height = chartH * dpr;
+      canvas.style.width = chartW + 'px';
+      canvas.style.height = chartH + 'px';
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    resizeChartCanvas();
+
+    class ChartLine {
+      constructor() {
+        this.points = [];
+        this.numPoints = 50;
+        this.y = Math.random() * chartH;
+        this.speed = 0.5 + Math.random() * 1;
+        this.amplitude = 50 + Math.random() * 100;
+        this.frequency = 0.01 + Math.random() * 0.02;
+        this.offset = Math.random() * Math.PI * 2;
+        for (let i = 0; i < this.numPoints; i++) {
+          this.points.push({ x: (chartW / this.numPoints) * i, y: this.y });
+        }
+      }
+      update() {
+        this.offset += this.speed * 0.02;
+        for (let i = 0; i < this.points.length; i++) {
+          this.points[i].y = this.y + Math.sin(i * this.frequency + this.offset) * this.amplitude;
+        }
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.moveTo(this.points[0].x, this.points[0].y);
+        for (let i = 1; i < this.points.length; i++) ctx.lineTo(this.points[i].x, this.points[i].y);
+        ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+    }
+
+    let lines = [];
+    function initLines() {
+      lines = [];
+      for (let i = 0; i < 3; i++) lines.push(new ChartLine()); // fewer lines
+    }
+    initLines();
+
+    let heroActive = true;
+    const heroEl = document.querySelector('header.hero');
+    const heroObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        heroActive = entry.isIntersecting;
+      });
+    }, { threshold: 0.1 });
+    heroObserver.observe(heroEl);
+
+    function animateHero() {
+      ctx.clearRect(0, 0, chartW, chartH);
+      if (heroActive) {
+        lines.forEach(l => { l.update(); l.draw(); });
+      }
+      requestAnimationFrame(animateHero);
+    }
+    animateHero();
+
+    /* STARFIELD (optimized) */
+    const starsCanvas = document.getElementById('starsCanvas');
+    const sctx = starsCanvas.getContext('2d');
+
+    let stars = [], planets = [], constellations = [], shootingStars = [], moonPhaseValue = 0;
+    let starsW = 0, starsH = 0;
+
+    function resizeStarsCanvas() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+      const mainRect = document.querySelector('.main-content').getBoundingClientRect();
+
+      const w = Math.max(window.innerWidth, mainRect.width);
+      const h = Math.min(mainRect.height, window.innerHeight * 2.5); // limit height for perf
+
+      starsW = w;
+      starsH = h;
+
+      starsCanvas.width = w * dpr;
+      starsCanvas.height = h * dpr;
+      starsCanvas.style.width = w + 'px';
+      starsCanvas.style.height = h + 'px';
+
+      sctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function getMoonPhase(date) {
+      const synodicMonth = 29.53058867;
+      const knownNewMoon = new Date(Date.UTC(2000, 0, 6, 18, 14));
+      const diff = date.getTime() - knownNewMoon.getTime();
+      const days = diff / 86400000;
+      let phase = days % synodicMonth;
+      if (phase < 0) phase += synodicMonth;
+      return phase / synodicMonth;
+    }
+
+    function initStars() {
+      stars = []; planets = []; constellations = []; shootingStars = [];
+      const count = 110; // fewer stars
+      for (let i = 0; i < count; i++) {
+        stars.push({
+          x: Math.random() * starsW,
+          y: Math.random() * starsH,
+          r: Math.random() * 1.9 + 0.5,
+          alpha: 0.4 + Math.random() * 0.6,
+          twinkle: 0.004 + Math.random() * 0.006
         });
-
-        const canvas = document.getElementById('chartCanvas');
-        const ctx = canvas.getContext('2d');
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-
-        class ChartLine {
-            constructor() {
-                this.points = [];
-                this.numPoints = 50;
-                this.y = Math.random() * canvas.height;
-                this.speed = 0.5 + Math.random() * 1;
-                this.amplitude = 50 + Math.random() * 100;
-                this.frequency = 0.01 + Math.random() * 0.02;
-                this.offset = Math.random() * Math.PI * 2;
-                
-                for (let i = 0; i < this.numPoints; i++) {
-                    this.points.push({
-                        x: (canvas.width / this.numPoints) * i,
-                        y: this.y
-                    });
-                }
-            }
-
-            update() {
-                this.offset += this.speed * 0.02;
-                for (let i = 0; i < this.points.length; i++) {
-                    this.points[i].y = this.y + Math.sin(i * this.frequency + this.offset) * this.amplitude;
-                }
-            }
-
-            draw() {
-                ctx.beginPath();
-                ctx.moveTo(this.points[0].x, this.points[0].y);
-                for (let i = 1; i < this.points.length; i++) {
-                    ctx.lineTo(this.points[i].x, this.points[i].y);
-                }
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
-                ctx.lineWidth = 1.5;
-                ctx.stroke();
-            }
-        }
-
-        const lines = [];
-        for (let i = 0; i < 5; i++) {
-            lines.push(new ChartLine());
-        }
-
-        function animateHero() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            lines.forEach(line => {
-                line.update();
-                line.draw();
-            });
-            requestAnimationFrame(animateHero);
-        }
-
-        animateHero();
-
-        window.addEventListener('resize', () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            lines.length = 0;
-            for (let i = 0; i < 5; i++) {
-                lines.push(new ChartLine());
-            }
-            resizeStarsCanvas();
-            initStars();
+      }
+      for (let i = 0; i < 8; i++) {
+        const a = stars[Math.floor(Math.random() * stars.length)];
+        const b = stars[Math.floor(Math.random() * stars.length)];
+        const dist = Math.hypot(a.x - b.x, a.y - b.y);
+        if (dist < starsW / 2) constellations.push({ a, b, alpha: 0.28 + Math.random() * 0.2 });
+      }
+      const palette = [
+        ['rgba(120,180,255,0.95)','rgba(50,70,130,0.9)'],
+        ['rgba(255,190,140,0.95)','rgba(150,90,60,0.9)'],
+        ['rgba(200,160,255,0.95)','rgba(110,80,150,0.9)']
+      ];
+      for (let i = 0; i < 3; i++) {
+        const [c1,c2] = palette[i%palette.length];
+        planets.push({
+          x: Math.random() * starsW * 0.6 + starsW * 0.1,
+          y: (i===0)?starsH*0.25:Math.random()*starsH*0.6 + starsH*0.2,
+          r: 14 + Math.random()*18,
+          c1, c2,
+          ring: Math.random()>.5
         });
+      }
+      moonPhaseValue = getMoonPhase(new Date());
+    }
 
-        const starsCanvas = document.getElementById('starsCanvas');
-        const starsCtx = starsCanvas.getContext('2d');
+    function spawnShootingStar() {
+      const startX = Math.random() * starsW;
+      const startY = Math.random() * starsH * 0.4;
+      const speed = 5 + Math.random()*4;
+      shootingStars.push({ x: startX, y: startY, vx: -speed, vy: speed*0.6, life: 0, maxLife: 80 + Math.random()*60 });
+    }
 
-        let stars = [];
-        let shootingStars = [];
-        let constellations = [];
-        let planets = [];
-        let moonPhaseValue = 0;
+    function updateStars() {
+      stars.forEach(s => {
+        s.alpha += s.twinkle * (Math.random() > .5 ? 1 : -1);
+        if (s.alpha < .3) s.alpha = .3;
+        if (s.alpha > 1) s.alpha = 1;
+      });
+      shootingStars.forEach(s => { s.x += s.vx; s.y += s.vy; s.life++; });
+      shootingStars = shootingStars.filter(s => s.life < s.maxLife && s.x > -150 && s.x < starsW + 150 && s.y < starsH + 150);
+      if (Math.random() < 0.03 && shootingStars.length < 2) spawnShootingStar(); // fewer
+    }
 
-        function resizeStarsCanvas() {
-            const mainContent = document.querySelector('.main-content');
-            const rect = mainContent.getBoundingClientRect();
-            starsCanvas.width = rect.width;
-            starsCanvas.height = rect.height;
+    function drawMilkyWay() {
+      sctx.save(); sctx.translate(starsW/2, starsH/2); sctx.rotate(-0.4);
+      const width = starsW * 1.6; const height = 140;
+      const mg = sctx.createLinearGradient(-width/2,0,width/2,0);
+      mg.addColorStop(0,'rgba(40,40,80,0)');
+      mg.addColorStop(.5,'rgba(120,140,220,0.18)');
+      mg.addColorStop(1,'rgba(40,40,80,0)');
+      sctx.globalAlpha = 0.8; sctx.fillStyle = mg; sctx.fillRect(-width/2, -height/2, width, height); sctx.globalAlpha = 1; sctx.restore();
+    }
+
+    function drawPlanets() {
+      planets.forEach(p => {
+        const glow = sctx.createRadialGradient(p.x, p.y, p.r*0.2, p.x, p.y, p.r*2.2);
+        glow.addColorStop(0, 'rgba(255,255,255,0.18)');
+        glow.addColorStop(1, 'rgba(0,0,0,0)');
+        sctx.fillStyle = glow; sctx.beginPath(); sctx.arc(p.x,p.y,p.r*2.2,0,Math.PI*2); sctx.fill();
+
+        const g = sctx.createRadialGradient(p.x - p.r*0.3, p.y - p.r*0.4, p.r*0.2, p.x, p.y, p.r);
+        g.addColorStop(0, p.c1); g.addColorStop(1, p.c2);
+        sctx.fillStyle = g; sctx.beginPath(); sctx.arc(p.x,p.y,p.r,0,Math.PI*2); sctx.fill();
+
+        if (p.ring) {
+          sctx.save(); sctx.translate(p.x, p.y); sctx.rotate(-0.7);
+          sctx.strokeStyle = 'rgba(210,220,255,0.5)'; sctx.lineWidth = 1.3; sctx.beginPath();
+          sctx.ellipse(0,0,p.r*1.6,p.r*0.5,0,0,Math.PI*2); sctx.stroke(); sctx.restore();
         }
+      });
+    }
 
-        function getMoonPhase(date) {
-            const synodicMonth = 29.53058867;
-            const knownNewMoon = new Date(Date.UTC(2000, 0, 6, 18, 14));
-            const diff = date.getTime() - knownNewMoon.getTime();
-            const days = diff / 86400000;
-            let phase = days % synodicMonth;
-            if (phase < 0) phase += synodicMonth;
-            return phase / synodicMonth;
-        }
+    function drawMoon() {
+      const padding = 60; const radius = 32; const x = starsW - padding; const y = padding + 10;
+      const glowGrad = sctx.createRadialGradient(x,y,radius*0.3,x,y,radius*2.4);
+      glowGrad.addColorStop(0,'rgba(220,230,255,0.45)');
+      glowGrad.addColorStop(1,'rgba(5,5,15,0)');
+      sctx.fillStyle = glowGrad; sctx.beginPath(); sctx.arc(x,y,radius*2.4,0,Math.PI*2); sctx.fill();
 
-        function initStars() {
-            stars = [];
-            planets = [];
-            const count = 180;
-            for (let i = 0; i < count; i++) {
-                stars.push({
-                    x: Math.random() * starsCanvas.width,
-                    y: Math.random() * starsCanvas.height,
-                    r: Math.random() * 1.9 + 0.5,
-                    alpha: 0.4 + Math.random() * 0.6,
-                    twinkle: 0.004 + Math.random() * 0.006
-                });
-            }
+      const moonGrad = sctx.createRadialGradient(x - radius*0.3, y - radius*0.4, radius*0.2, x, y, radius);
+      moonGrad.addColorStop(0,'rgba(255,255,255,0.98)');
+      moonGrad.addColorStop(1,'rgba(210,220,250,0.92)');
+      sctx.fillStyle = moonGrad; sctx.beginPath(); sctx.arc(x,y,radius,0,Math.PI*2); sctx.fill();
 
-            constellations = [];
-            for (let i = 0; i < 10; i++) {
-                const a = stars[Math.floor(Math.random() * stars.length)];
-                const b = stars[Math.floor(Math.random() * stars.length)];
-                const dist = Math.hypot(a.x - b.x, a.y - b.y);
-                if (dist < starsCanvas.width / 2) {
-                    constellations.push({ a, b, alpha: 0.28 + Math.random() * 0.2 });
-                }
-            }
+      const phase = moonPhaseValue;
+      const phaseAngle = (phase <= 0.5) ? phase*2 : (1 - phase)*2;
+      const offset = (1 - phaseAngle) * radius;
+      sctx.save(); sctx.globalCompositeOperation = 'destination-out'; sctx.beginPath();
+      sctx.arc(x + offset * (phase < 0.5 ? 1 : -1), y, radius, 0, Math.PI*2); sctx.fill(); sctx.restore();
 
-            const planetCount = 3;
-            const palette = [
-                ['rgba(120,180,255,0.95)', 'rgba(50,70,130,0.9)'],
-                ['rgba(255,190,140,0.95)', 'rgba(150,90,60,0.9)'],
-                ['rgba(200,160,255,0.95)', 'rgba(110,80,150,0.9)']
-            ];
+      sctx.save(); sctx.globalCompositeOperation = 'multiply'; sctx.fillStyle = 'rgba(90,100,140,0.45)'; sctx.beginPath(); sctx.arc(x,y,radius,0,Math.PI*2); sctx.fill(); sctx.restore();
+    }
 
-            for (let i = 0; i < planetCount; i++) {
-                const [c1, c2] = palette[i % palette.length];
-                planets.push({
-                    x: Math.random() * starsCanvas.width * 0.6 + starsCanvas.width * 0.1,
-                    y: (i === 0)
-                        ? starsCanvas.height * 0.25
-                        : Math.random() * starsCanvas.height * 0.6 + starsCanvas.height * 0.2,
-                    r: 14 + Math.random() * 18,
-                    c1,
-                    c2,
-                    ring: Math.random() > 0.5
-                });
-            }
+    function drawStars() {
+      sctx.clearRect(0,0,starsW,starsH);
+      const bgGrad = sctx.createLinearGradient(0,0,0,starsH);
+      bgGrad.addColorStop(0,'rgba(10,10,25,0.9)');
+      bgGrad.addColorStop(1,'rgba(5,5,15,0.99)');
+      sctx.fillStyle = bgGrad; sctx.fillRect(0,0,starsW,starsH);
 
-            moonPhaseValue = getMoonPhase(new Date());
-        }
+      drawMilkyWay();
+      drawPlanets();
 
-        function spawnShootingStar() {
-            const startX = Math.random() * starsCanvas.width;
-            const startY = Math.random() * starsCanvas.height * 0.4;
-            const speed = 5 + Math.random() * 4;
+      stars.forEach(s => {
+        sctx.beginPath();
+        sctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+        sctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
+        sctx.fill();
+      });
 
-            shootingStars.push({
-                x: startX,
-                y: startY,
-                vx: -speed,
-                vy: speed * 0.6,
-                life: 0,
-                maxLife: 80 + Math.random() * 60
-            });
-        }
+      constellations.forEach(c => {
+        sctx.beginPath();
+        sctx.moveTo(c.a.x,c.a.y);
+        sctx.lineTo(c.b.x,c.b.y);
+        sctx.strokeStyle = `rgba(140,170,255,${c.alpha})`;
+        sctx.lineWidth = 1;
+        sctx.stroke();
+      });
 
-        function updateStars() {
-            stars.forEach(s => {
-                s.alpha += s.twinkle * (Math.random() > 0.5 ? 1 : -1);
-                if (s.alpha < 0.3) s.alpha = 0.3;
-                if (s.alpha > 1) s.alpha = 1;
-            });
+      shootingStars.forEach(s => {
+        const trailLength = 70;
+        const trailX = s.x - s.vx * (trailLength/10);
+        const trailY = s.y - s.vy * (trailLength/10);
+        const grad = sctx.createLinearGradient(trailX, trailY, s.x, s.y);
+        grad.addColorStop(0,'rgba(255,255,255,0)');
+        grad.addColorStop(1,'rgba(230,240,255,1)');
+        sctx.beginPath();
+        sctx.moveTo(trailX, trailY);
+        sctx.lineTo(s.x,s.y);
+        sctx.strokeStyle = grad;
+        sctx.lineWidth = 3;
+        sctx.stroke();
 
-            shootingStars.forEach(s => {
-                s.x += s.vx;
-                s.y += s.vy;
-                s.life++;
-            });
+        sctx.beginPath();
+        sctx.arc(s.x,s.y,3,0,Math.PI*2);
+        sctx.fillStyle = 'rgba(255,255,255,1)';
+        sctx.fill();
+      });
 
-            shootingStars = shootingStars.filter(s => 
-                s.life < s.maxLife &&
-                s.x > -150 && s.x < starsCanvas.width + 150 &&
-                s.y < starsCanvas.height + 150
-            );
+      drawMoon();
+    }
 
-            if (Math.random() < 0.06 && shootingStars.length < 4) {
-                spawnShootingStar();
-            }
-        }
+    let starFrame = 0;
+    function animateStars() {
+      starFrame++;
+      if (starFrame % 2 === 0) { // ~30 FPS
+        updateStars();
+        drawStars();
+      }
+      requestAnimationFrame(animateStars);
+    }
 
-        function drawMilkyWay() {
-            starsCtx.save();
-            starsCtx.translate(starsCanvas.width / 2, starsCanvas.height / 2);
-            starsCtx.rotate(-0.4);
+    window.addEventListener('load', () => {
+      resizeStarsCanvas();
+      initStars();
+      animateStars();
+    });
 
-            const width = starsCanvas.width * 1.6;
-            const height = 140;
+    window.addEventListener('resize', () => {
+      resizeChartCanvas();
+      initLines();
+      resizeStarsCanvas();
+      initStars();
+      updateProgress();
+    });
 
-            const mg = starsCtx.createLinearGradient(-width / 2, 0, width / 2, 0);
-            mg.addColorStop(0, 'rgba(40,40,80,0)');
-            mg.addColorStop(0.5, 'rgba(120,140,220,0.18)');
-            mg.addColorStop(1, 'rgba(40,40,80,0)');
+    const ro = new ResizeObserver(() => {
+      resizeStarsCanvas();
+    });
+    ro.observe(document.body);
 
-            starsCtx.globalAlpha = 0.8;
-            starsCtx.fillStyle = mg;
-            starsCtx.fillRect(-width / 2, -height / 2, width, height);
-
-            starsCtx.globalAlpha = 1;
-            starsCtx.restore();
-        }
-
-        function drawPlanets() {
-            planets.forEach(p => {
-                const glow = starsCtx.createRadialGradient(p.x, p.y, p.r * 0.2, p.x, p.y, p.r * 2.2);
-                glow.addColorStop(0, 'rgba(255,255,255,0.18)');
-                glow.addColorStop(1, 'rgba(0,0,0,0)');
-                starsCtx.fillStyle = glow;
-                starsCtx.beginPath();
-                starsCtx.arc(p.x, p.y, p.r * 2.2, 0, Math.PI * 2);
-                starsCtx.fill();
-
-                const g = starsCtx.createRadialGradient(
-                    p.x - p.r * 0.3, p.y - p.r * 0.3, p.r * 0.2,
-                    p.x, p.y, p.r
-                );
-                g.addColorStop(0, p.c1);
-                g.addColorStop(1, p.c2);
-                starsCtx.fillStyle = g;
-                starsCtx.beginPath();
-                starsCtx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-                starsCtx.fill();
-
-                if (p.ring) {
-                    starsCtx.save();
-                    starsCtx.translate(p.x, p.y);
-                    starsCtx.rotate(-0.7);
-                    starsCtx.strokeStyle = 'rgba(210,220,255,0.5)';
-                    starsCtx.lineWidth = 1.3;
-                    starsCtx.beginPath();
-                    starsCtx.ellipse(0, 0, p.r * 1.6, p.r * 0.5, 0, 0, Math.PI * 2);
-                    starsCtx.stroke();
-                    starsCtx.restore();
-                }
-            });
-        }
-
-        function drawMoon() {
-            const padding = 60;
-            const radius = 32;
-            const x = starsCanvas.width - padding;
-            const y = padding + 10;
-
-            const glowGrad = starsCtx.createRadialGradient(x, y, radius * 0.3, x, y, radius * 2.4);
-            glowGrad.addColorStop(0, 'rgba(220, 230, 255, 0.45)');
-            glowGrad.addColorStop(1, 'rgba(5, 5, 15, 0)');
-            starsCtx.fillStyle = glowGrad;
-            starsCtx.beginPath();
-            starsCtx.arc(x, y, radius * 2.4, 0, Math.PI * 2);
-            starsCtx.fill();
-
-            const moonGrad = starsCtx.createRadialGradient(
-                x - radius * 0.3,
-                y - radius * 0.4,
-                radius * 0.2,
-                x,
-                y,
-                radius
-            );
-            moonGrad.addColorStop(0, 'rgba(255, 255, 255, 0.98)');
-            moonGrad.addColorStop(1, 'rgba(210, 220, 250, 0.92)');
-            starsCtx.fillStyle = moonGrad;
-            starsCtx.beginPath();
-            starsCtx.arc(x, y, radius, 0, Math.PI * 2);
-            starsCtx.fill();
-
-            const phase = moonPhaseValue;
-            const phaseAngle = (phase <= 0.5) ? phase * 2 : (1 - phase) * 2;
-            const offset = (1 - phaseAngle) * radius;
-
-            starsCtx.save();
-            starsCtx.globalCompositeOperation = 'destination-out';
-            starsCtx.beginPath();
-            starsCtx.arc(x + offset * (phase < 0.5 ? 1 : -1), y, radius, 0, Math.PI * 2);
-            starsCtx.fill();
-            starsCtx.restore();
-
-            starsCtx.save();
-            starsCtx.globalCompositeOperation = 'multiply';
-            starsCtx.fillStyle = 'rgba(90, 100, 140, 0.45)';
-            starsCtx.beginPath();
-            starsCtx.arc(x, y, radius, 0, Math.PI * 2);
-            starsCtx.fill();
-            starsCtx.restore();
-        }
-
-        function drawStars() {
-            starsCtx.clearRect(0, 0, starsCanvas.width, starsCanvas.height);
-
-            const bgGrad = starsCtx.createLinearGradient(0, 0, 0, starsCanvas.height);
-            bgGrad.addColorStop(0, 'rgba(10,10,25,0.9)');
-            bgGrad.addColorStop(1, 'rgba(5,5,15,0.99)');
-            starsCtx.fillStyle = bgGrad;
-            starsCtx.fillRect(0, 0, starsCanvas.width, starsCanvas.height);
-
-            drawMilkyWay();
-            drawPlanets();
-
-            stars.forEach(s => {
-                starsCtx.beginPath();
-                starsCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-                starsCtx.fillStyle = `rgba(255, 255, 255, ${s.alpha})`;
-                starsCtx.fill();
-            });
-
-            constellations.forEach(c => {
-                starsCtx.beginPath();
-                starsCtx.moveTo(c.a.x, c.a.y);
-                starsCtx.lineTo(c.b.x, c.b.y);
-                starsCtx.strokeStyle = `rgba(140, 170, 255, ${c.alpha})`;
-                starsCtx.lineWidth = 1;
-                starsCtx.stroke();
-            });
-
-            shootingStars.forEach(s => {
-                const trailLength = 70;
-                const trailX = s.x - s.vx * (trailLength / 10);
-                const trailY = s.y - s.vy * (trailLength / 10);
-
-                const grad = starsCtx.createLinearGradient(trailX, trailY, s.x, s.y);
-                grad.addColorStop(0, 'rgba(255,255,255,0)');
-                grad.addColorStop(1, 'rgba(230,240,255,1)');
-
-                starsCtx.beginPath();
-                starsCtx.moveTo(trailX, trailY);
-                starsCtx.lineTo(s.x, s.y);
-                starsCtx.strokeStyle = grad;
-                starsCtx.lineWidth = 3;
-                starsCtx.stroke();
-
-                starsCtx.beginPath();
-                starsCtx.arc(s.x, s.y, 3, 0, Math.PI * 2);
-                starsCtx.fillStyle = 'rgba(255,255,255,1)';
-                starsCtx.fill();
-            });
-
-            drawMoon();
-        }
-
-        function animateStars() {
-            updateStars();
-            drawStars();
-            requestAnimationFrame(animateStars);
-        }
-
-        function initStarField() {
-            resizeStarsCanvas();
-            initStars();
-        }
-
-        window.addEventListener('load', () => {
-            initStarField();
-            animateStars();
-        });
-    </script>
+    /* Contact form demo */
+    document.getElementById('contactForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = e.target.name.value.trim();
+      const btn = e.target.querySelector('button');
+      btn.innerText = 'Sending...';
+      setTimeout(() => {
+        e.target.reset();
+        btn.innerText = 'Send Message';
+        alert('Thanks, ' + (name || 'there') + '! Message sent (demo).');
+      }, 900);
+    });
+  </script>
 </body>
 </html>
